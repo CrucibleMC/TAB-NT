@@ -11,6 +11,7 @@ import me.neznamy.tab.platforms.bukkit.features.BukkitTabExpansion;
 import me.neznamy.tab.platforms.bukkit.features.PerWorldPlayerList;
 import me.neznamy.tab.platforms.bukkit.header.HeaderFooter;
 import me.neznamy.tab.platforms.bukkit.hook.BukkitPremiumVanishHook;
+import me.neznamy.tab.platforms.bukkit.necrotempus.NecroTempusAsk;
 import me.neznamy.tab.platforms.bukkit.nms.BukkitReflection;
 import me.neznamy.tab.platforms.bukkit.nms.PingRetriever;
 import me.neznamy.tab.platforms.bukkit.nms.converter.ComponentConverter;
@@ -86,25 +87,35 @@ public class BukkitPlatform implements BackendPlatform {
      *          Plugin
      */
     public BukkitPlatform(@NotNull JavaPlugin plugin) {
+
         this.plugin = plugin;
+
         long time = System.currentTimeMillis();
+
         try {
             Object server = Bukkit.getServer().getClass().getMethod("getServer").invoke(Bukkit.getServer());
             recentTps = ((double[]) server.getClass().getField("recentTps").get(server));
         } catch (ReflectiveOperationException ignored) {
             //not spigot
         }
+
         if (Bukkit.getPluginManager().isPluginEnabled("PremiumVanish")) {
             new BukkitPremiumVanishHook().register();
         }
+
         PingRetriever.tryLoad();
         ComponentConverter.tryLoad();
         ScoreboardLoader.findInstance();
         TabListBase.findInstance();
+
         if (BukkitReflection.getMinorVersion() >= 8) {
             HeaderFooter.findInstance();
             BukkitPipelineInjector.tryLoad();
+        }else{
+            if(NecroTempusAsk.isAvailable())
+                HeaderFooter.findInstance();
         }
+
         BukkitUtils.sendCompatibilityMessage();
         Bukkit.getConsoleSender().sendMessage("[TAB] §7Loaded NMS hook in " + (System.currentTimeMillis()-time) + "ms");
     }
@@ -275,7 +286,7 @@ public class BukkitPlatform implements BackendPlatform {
         if (AdventureBossBar.isAvailable() && Audience.class.isAssignableFrom(Player.class)) return new AdventureBossBar(player);
 
         // 1.9+ server, handle using API, potential 1.8 players are handled by ViaVersion
-        if (BukkitReflection.getMinorVersion() >= 9) return new BukkitBossBar((BukkitTabPlayer) player);
+        if (BukkitReflection.getMinorVersion() >= 9 || NecroTempusAsk.isAvailable()) return new BukkitBossBar((BukkitTabPlayer) player);
 
         // 1.9+ player on 1.8 server, handle using ViaVersion API
         if (player.getVersion().getMinorVersion() >= 9) return new ViaBossBar((BukkitTabPlayer) player);

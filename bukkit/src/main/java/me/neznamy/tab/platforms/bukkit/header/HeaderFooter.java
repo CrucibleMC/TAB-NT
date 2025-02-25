@@ -1,9 +1,11 @@
 package me.neznamy.tab.platforms.bukkit.header;
 
 import lombok.Getter;
+import me.neznamy.chat.component.TabComponent;
 import me.neznamy.tab.platforms.bukkit.BukkitTabPlayer;
 import me.neznamy.tab.platforms.bukkit.BukkitUtils;
-import me.neznamy.chat.component.TabComponent;
+import me.neznamy.tab.platforms.bukkit.necrotempus.NecroTempusAsk;
+import me.neznamy.tab.platforms.bukkit.necrotempus.NecroTempusHeaderFooter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,6 +28,10 @@ public abstract class HeaderFooter {
 
     @Nullable
     private static HeaderFooter findInstance0() {
+
+        if(NecroTempusAsk.isAvailable())
+            return new NecroTempusHeaderFooter();
+
         try {
             return new PacketHeaderFooter();
         } catch (Exception e) {

@@ -15,4 +15,6 @@ dependencies {
         exclude("net.md-5", "bungeecord-chat")
     }
     compileOnly("com.github.LeonMangler:PremiumVanishAPI:2.8.8")
+    compileOnly(files("../libs/necrotempus-1.3.3-api.jar"))
+
 }
