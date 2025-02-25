@@ -1,4 +1,4 @@
-package me.neznamy.tab.platforms.bukkit.necrotempus;
+package me.neznamy.tab.shared.necrotempus;
 
 public class NecroTempusAsk {
 

@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import me.neznamy.tab.shared.TAB;
 import me.neznamy.tab.shared.config.file.ConfigurationSection;
 import me.neznamy.tab.shared.features.PlaceholderManagerImpl;
+import me.neznamy.tab.shared.necrotempus.NecroTempusAsk;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -129,7 +130,7 @@ public class ScoreboardConfiguration {
                     break;
                 }
             }
-            if (found && !TAB.getInstance().getPlatform().supportsNumberFormat()) {
+            if (found && !TAB.getInstance().getPlatform().supportsNumberFormat() && !NecroTempusAsk.isAvailable()) {
                 section.startupWarn("Scoreboard \"" + name + "\" is using right-side text alignment (using ||) in the lines, however, your server does not " +
                         "support this feature. It was added into the game in version 1.20.3. Any text defined after || in lines will not be displayed.");
             }

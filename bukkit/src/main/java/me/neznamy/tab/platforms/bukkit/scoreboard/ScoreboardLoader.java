@@ -7,6 +7,7 @@ import me.neznamy.tab.platforms.bukkit.BukkitTabPlayer;
 import me.neznamy.tab.platforms.bukkit.BukkitUtils;
 import me.neznamy.tab.platforms.bukkit.nms.BukkitReflection;
 import me.neznamy.tab.platforms.bukkit.scoreboard.packet.PacketScoreboard;
+import me.neznamy.tab.shared.necrotempus.NecroTempusAsk;
 import me.neznamy.tab.shared.platform.Scoreboard;
 import me.neznamy.tab.shared.platform.impl.DummyScoreboard;
 import me.neznamy.tab.shared.util.function.FunctionWithException;
@@ -40,7 +41,7 @@ public class ScoreboardLoader {
                     "Compatibility with other plugins being reduced",
                     "Features receiving new artificial character limits"
             );
-            if (BukkitReflection.is1_20_3Plus()) {
+            if (BukkitReflection.is1_20_3Plus() && !NecroTempusAsk.isAvailable()) {
                 missingFeatures.add("1.20.3+ visuals not working due to lack of API"); // soontm?
             }
             BukkitUtils.compatibilityError(PacketScoreboard.getException(), "Scoreboards", "Bukkit API", missingFeatures.toArray(new String[0]));

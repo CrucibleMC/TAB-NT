@@ -4,8 +4,8 @@ import lombok.Getter;
 import me.neznamy.chat.component.TabComponent;
 import me.neznamy.tab.platforms.bukkit.BukkitTabPlayer;
 import me.neznamy.tab.platforms.bukkit.BukkitUtils;
-import me.neznamy.tab.platforms.bukkit.necrotempus.NecroTempusAsk;
 import me.neznamy.tab.platforms.bukkit.necrotempus.NecroTempusHeaderFooter;
+import me.neznamy.tab.shared.necrotempus.NecroTempusAsk;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

@@ -30,6 +30,7 @@ dependencies {
         exclude("org.slf4j", "slf4j-api")
     }
     implementation("com.saicone.delivery4j:extension-guava:1.1.1")
+    compileOnlyApi(files("../libs/necrotempus-1.3.3-api.jar"))
 }
 
 blossom {

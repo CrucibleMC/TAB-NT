@@ -13,6 +13,7 @@ import me.neznamy.tab.shared.features.scoreboard.ScoreboardImpl;
 import me.neznamy.tab.shared.features.scoreboard.ScoreboardManagerImpl;
 import me.neznamy.tab.shared.features.types.CustomThreaded;
 import me.neznamy.tab.shared.features.types.RefreshableFeature;
+import me.neznamy.tab.shared.necrotempus.NecroTempusAsk;
 import me.neznamy.tab.shared.platform.Scoreboard;
 import me.neznamy.tab.shared.platform.TabPlayer;
 import org.jetbrains.annotations.NotNull;
@@ -233,6 +234,14 @@ public abstract class ScoreboardLine extends RefreshableFeature implements Line,
      *          Inputted text to categorize
      */
     protected void initializeText(@NotNull String text) {
+
+        if(text.contains("||") && NecroTempusAsk.isAvailable()){
+            this.text = text;
+            this.numberFormat = "";
+
+            return;
+        }
+
         String[] split = text.split("\\|\\|");
         this.text = split[0];
         numberFormat = split.length >= 2 ? split[1] : "";

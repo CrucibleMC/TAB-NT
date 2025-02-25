@@ -2,12 +2,12 @@ package me.neznamy.tab.shared.features.scoreboard;
 
 import lombok.Getter;
 import lombok.NonNull;
+import me.neznamy.chat.component.SimpleTextComponent;
 import me.neznamy.tab.api.scoreboard.Line;
 import me.neznamy.tab.shared.Property;
 import me.neznamy.tab.shared.ProtocolVersion;
 import me.neznamy.tab.shared.TAB;
 import me.neznamy.tab.shared.TabConstants;
-import me.neznamy.chat.component.SimpleTextComponent;
 import me.neznamy.tab.shared.cpu.ThreadExecutor;
 import me.neznamy.tab.shared.features.scoreboard.ScoreboardConfiguration.ScoreboardDefinition;
 import me.neznamy.tab.shared.features.scoreboard.lines.LongLine;
@@ -15,6 +15,7 @@ import me.neznamy.tab.shared.features.scoreboard.lines.ScoreboardLine;
 import me.neznamy.tab.shared.features.scoreboard.lines.StableDynamicLine;
 import me.neznamy.tab.shared.features.types.CustomThreaded;
 import me.neznamy.tab.shared.features.types.RefreshableFeature;
+import me.neznamy.tab.shared.necrotempus.NecroTempusAsk;
 import me.neznamy.tab.shared.placeholders.conditions.Condition;
 import me.neznamy.tab.shared.platform.Scoreboard;
 import me.neznamy.tab.shared.platform.TabPlayer;
@@ -45,7 +46,9 @@ public class ScoreboardImpl extends RefreshableFeature implements me.neznamy.tab
     //display condition
     private Condition displayCondition;
 
-    /** Flag tracking whether this scoreboard was made using API or not */
+    /**
+     * Flag tracking whether this scoreboard was made using API or not
+     */
     private final boolean api;
 
     //lines of scoreboard
@@ -59,12 +62,9 @@ public class ScoreboardImpl extends RefreshableFeature implements me.neznamy.tab
     /**
      * Constructs new instance with given parameters and registers lines to feature manager
      *
-     * @param   manager
-     *          scoreboard manager
-     * @param   name
-     *          name of this scoreboard
-     * @param   definition
-     *          Scoreboard properties
+     * @param manager    scoreboard manager
+     * @param name       name of this scoreboard
+     * @param definition Scoreboard properties
      */
     public ScoreboardImpl(@NonNull ScoreboardManagerImpl manager, @NonNull String name, @NonNull ScoreboardDefinition definition) {
         this(manager, name, definition, false, false);
@@ -77,31 +77,28 @@ public class ScoreboardImpl extends RefreshableFeature implements me.neznamy.tab
     /**
      * Constructs new instance with given parameters and registers lines to feature manager
      *
-     * @param   manager
-     *          scoreboard manager
-     * @param   name
-     *          name of this scoreboard
-     * @param   definition
-     *          Scoreboard properties
-     * @param   dynamicLinesOnly
-     *          Whether this scoreboard should only use dynamic lines or not
-     * @param   api
-     *          Whether this scoreboard was created using API or not
+     * @param manager          scoreboard manager
+     * @param name             name of this scoreboard
+     * @param definition       Scoreboard properties
+     * @param dynamicLinesOnly Whether this scoreboard should only use dynamic lines or not
+     * @param api              Whether this scoreboard was created using API or not
      */
     public ScoreboardImpl(@NonNull ScoreboardManagerImpl manager, @NonNull String name, @NonNull ScoreboardDefinition definition, boolean dynamicLinesOnly, boolean api) {
         this.manager = manager;
         this.name = name;
         this.api = api;
         title = definition.getTitle();
-        for (int i = 0; i< definition.getLines().size(); i++) {
+        for (int i = 0; i < definition.getLines().size(); i++) {
             String line = definition.getLines().get(i);
             if (line == null) line = "";
             if (line.contains("||")) containsNumberFormat = true;
+            if (containsNumberFormat && NecroTempusAsk.isAvailable())
+                containsNumberFormat = false;
             ScoreboardLine score;
             if (dynamicLinesOnly) {
-                score = new StableDynamicLine(this, i+1, line);
+                score = new StableDynamicLine(this, i + 1, line);
             } else {
-                score = registerLine(i+1, line);
+                score = registerLine(i + 1, line);
             }
             lines.add(score);
             TAB.getInstance().getFeatureManager().registerFeature(TabConstants.Feature.scoreboardLine(name, i), score);
@@ -111,11 +108,9 @@ public class ScoreboardImpl extends RefreshableFeature implements me.neznamy.tab
     /**
      * Registers line with given text and line number
      *
-     * @param   lineNumber
-     *          ID of line
-     * @param   text
-     *          text to display
-     * @return  most optimal line from provided text
+     * @param lineNumber ID of line
+     * @param text       text to display
+     * @return most optimal line from provided text
      */
     private @NotNull ScoreboardLine registerLine(int lineNumber, @Nullable String text) {
         if (text == null) return new LongLine(this, lineNumber, "");
@@ -131,9 +126,8 @@ public class ScoreboardImpl extends RefreshableFeature implements me.neznamy.tab
     /**
      * Returns true if condition is null or is met, false otherwise
      *
-     * @param   p
-     *          player to check
-     * @return  true if condition is null or is met, false otherwise
+     * @param p player to check
+     * @return true if condition is null or is met, false otherwise
      */
     public boolean isConditionMet(@NonNull TabPlayer p) {
         return displayCondition == null || displayCondition.isMet(p);
@@ -143,8 +137,7 @@ public class ScoreboardImpl extends RefreshableFeature implements me.neznamy.tab
      * Adds the player into scoreboard. This includes registering properties,
      * as well as scoreboard and all lines.
      *
-     * @param   p
-     *          Player to send this scoreboard to
+     * @param p Player to send this scoreboard to
      */
     public void addPlayer(@NonNull TabPlayer p) {
         if (p.scoreboardData.activeScoreboard == this) return; // already registered
@@ -157,7 +150,7 @@ public class ScoreboardImpl extends RefreshableFeature implements me.neznamy.tab
                 new SimpleTextComponent("")
         );
         for (Line s : lines) {
-            ((ScoreboardLine)s).register(p);
+            ((ScoreboardLine) s).register(p);
         }
         players.add(p);
         p.scoreboardData.activeScoreboard = this;
@@ -173,8 +166,7 @@ public class ScoreboardImpl extends RefreshableFeature implements me.neznamy.tab
     /**
      * Unregisters player from this scoreboard.
      *
-     * @param   p
-     *          Player to unregister
+     * @param p Player to unregister
      */
     public void removePlayer(@NonNull TabPlayer p) {
         if (p.scoreboardData.activeScoreboard != this) return; // not registered
@@ -216,8 +208,7 @@ public class ScoreboardImpl extends RefreshableFeature implements me.neznamy.tab
      * Recalculate scores for each line if using numbers. This takes into
      * consideration lines that are not visible.
      *
-     * @param   p
-     *          Player to recalculate scores for
+     * @param p Player to recalculate scores for
      */
     public void recalculateScores(@NonNull TabPlayer p) {
         if (!manager.getConfiguration().isUseNumbers()) return;
@@ -229,7 +220,7 @@ public class ScoreboardImpl extends RefreshableFeature implements me.neznamy.tab
             if (pr.getCurrentRawValue().isEmpty() || (!pr.getCurrentRawValue().isEmpty() && !pr.get().isEmpty())) {
                 p.getScoreboard().setScore(
                         ScoreboardManagerImpl.OBJECTIVE_NAME,
-                        ((ScoreboardLine)line).getPlayerName(p),
+                        ((ScoreboardLine) line).getPlayerName(p),
                         score++,
                         null, // Makes no sense for TAB
                         ((ScoreboardLine) line).getScoreRefresher().getNumberFormat(p)
@@ -241,13 +232,12 @@ public class ScoreboardImpl extends RefreshableFeature implements me.neznamy.tab
     /**
      * Removes this player from list of players who can see it.
      *
-     * @param   player
-     *          Player to remove from set
+     * @param player Player to remove from set
      */
     public void removePlayerFromSet(@NonNull TabPlayer player) {
         players.remove(player);
         for (Line line : lines) {
-            ((ScoreboardLine)line).removePlayerSilently(player);
+            ((ScoreboardLine) line).removePlayerSilently(player);
         }
     }
 
@@ -279,7 +269,7 @@ public class ScoreboardImpl extends RefreshableFeature implements me.neznamy.tab
     @Override
     public void addLine(@NonNull String text) {
         ensureActive();
-        StableDynamicLine line = new StableDynamicLine(this, lines.size()+1, text);
+        StableDynamicLine line = new StableDynamicLine(this, lines.size() + 1, text);
         TAB.getInstance().getFeatureManager().registerFeature(TabConstants.Feature.scoreboardLine(name, lines.size()), line);
         lines.add(line);
         for (TabPlayer p : players) {
@@ -291,7 +281,8 @@ public class ScoreboardImpl extends RefreshableFeature implements me.neznamy.tab
     @Override
     public void removeLine(int index) {
         ensureActive();
-        if (index < 0 || index >= lines.size()) throw new IndexOutOfBoundsException("Index " + index + " is out of range (0 - " + (lines.size()-1) + ")");
+        if (index < 0 || index >= lines.size())
+            throw new IndexOutOfBoundsException("Index " + index + " is out of range (0 - " + (lines.size() - 1) + ")");
         ScoreboardLine line = (ScoreboardLine) lines.get(index);
         lines.remove(line);
         for (TabPlayer p : players) {
