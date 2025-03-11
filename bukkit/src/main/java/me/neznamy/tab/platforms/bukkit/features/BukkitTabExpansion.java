@@ -115,7 +115,12 @@ public class BukkitTabExpansion extends PlaceholderExpansion implements TabExpan
             // Added in 2.10.7 (Jul 28, 2020)
             unregister();
         } else {
-            PlaceholderAPI.unregisterExpansion(this);
+            if (ReflectionUtils.methodExists(PlaceholderExpansion.class, "unregisterExpansion")) {
+                PlaceholderAPI.unregisterExpansion(this);
+            }else {
+                // On 1.7.10 we might need to use the deprecated unregisterPlaceholderHook
+                PlaceholderAPI.unregisterPlaceholderHook(getIdentifier());
+            }
         }
     }
 }
